@@ -1,0 +1,3 @@
+g++ -o PJ2 project2.cc lexer.cc lexer.h inputbuf.h inputbuf.cc parser.h parser.cc
+
+
