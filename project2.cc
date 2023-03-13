@@ -6,6 +6,8 @@
 #include <iostream>
 #include <cstdio>
 #include <vector>
+#include <unordered_map>
+#include <unordered_set>
 #include <cstring>
 #include <cstdlib>
 #include "lexer.h"
@@ -15,8 +17,17 @@ using namespace std;
 
 vector<string> LHS;
 vector< vector<string> > RHS;
+vector<string> terminal;
+vector<string> non_terminal;
 
 
+bool isNonTerminal(string s)
+{
+    for (auto t : non_terminal)
+        if (t == s)
+            return true;
+    return false;
+}
 
 // read grammar
 void ReadGrammar()
@@ -24,15 +35,39 @@ void ReadGrammar()
     Parser myParser;
     myParser.ParseProgram(LHS, RHS);
 
-    for (int i = 0; i < LHS.size(); ++i)
+    terminal.clear();
+    non_terminal.clear();
+
+    for (auto s : LHS)
     {
-        cout << LHS[i] << " : ";
-        for (auto s : RHS[i])
-            cout << s << ' ';
-        cout << endl;
+        bool isIn = false;
+        for (auto t : non_terminal)
+            if (t == s){
+                isIn = true;
+                break;
+            }
+        if (!isIn)
+            non_terminal.push_back(s);
     }
 
+    for (int i = 0; i < LHS.size(); ++i)
+    {
+        for (auto s : RHS[i])
+        {
+            if (!isNonTerminal(s))
+            {
+                bool isIn = false;
+                for (auto t : terminal)
+                    if (t == s){
+                        isIn = true;
+                        break;
+                    }
 
+                if (!isIn)
+                    terminal.push_back(s);
+            }
+        }
+    }
     /*
     Token tmp = lexer.GetToken();
     while(tmp.token_type != END_OF_FILE)
@@ -46,46 +81,139 @@ void ReadGrammar()
 }
 
 // Task 1
-
 void printTerminalsAndNoneTerminals()
 {
-    for (int i = 0; i < LHS.size(); ++i)
-    {
-        for (int j = 0; j < RHS[i].size(); ++j)
-        {
-            if(isTerminal(RHS[i][j]))
-             cout << RHS[i][j] << " ";
-            
-        }
-    }
-    
-    for (int i = 0; i < LHS.size(); ++i)
-    cout << LHS[i] << " ";
-
+    //cout << "1\n";
+    for (auto s : terminal)
+        cout << s << ' ';
+    for (auto s : non_terminal)
+        cout << s << ' ';
 }
 
-// Task 1 helper function
-bool isTerminal(string symbol)
-{
-    for(int i = 0; i < LHS.size(); ++i)
-    {
-        if (symbol == LHS[i])
-            return false;
 
-    }
-    return true;
+inline bool existNonTerminal(vector<string> a)
+{
+    for (auto s : a)
+        if (isNonTerminal(s))
+            return true;
+    return false;
 }
 
 // Task 2
 void RemoveUselessSymbols()
 {
-    cout << "2\n";
+    //cout << "2\n";
+    // insert symbols to unordered map
+    unordered_map <string, bool> symbol;
+    //symbol["#"] = true;
+    // add nonterminal
+    for (auto s : non_terminal)
+        symbol[s] = false;
+    // add terminal
+    for (auto s : terminal)
+        symbol[s] = true;
+
+
+    // generating symbol
+    bool changed = true;
+    while (changed)
+    {
+        changed = false;
+        for (int i = 0; i < LHS.size(); ++i)
+        {
+            // assume it is generating
+            bool generating = true; 
+            for (auto s : RHS[i])
+                if (symbol[s] == false)     // if one right hand side is not generating
+                {
+                    generating = false;
+                    break;
+                }
+
+            if (generating && symbol[LHS[i]] == false)
+            {
+                symbol[LHS[i]] = true;
+                changed = true;
+            }
+        }
+    }
+
+    unordered_map<string, bool> reachable;
+    unordered_map<string, bool>::iterator it;
+    for (it = symbol.begin(); it != symbol.end(); ++it)
+        reachable[it->first] = false;
+
+    vector<string> newLHS;
+    vector< vector<string> > newRHS;
+
+    // calculating reachable
+    for (int i = 0; i < LHS.size(); ++i)
+    {
+        if (reachable[LHS[i]])
+        {
+            newLHS.push_back(LHS[i]);
+            newRHS.push_back(RHS[i]);
+        }
+        else if (symbol[LHS[i]])
+        {
+            bool reach = true;
+            if (!existNonTerminal(RHS[i]))
+                reach = false;
+            else{
+                for (auto s : RHS[i])
+                    if (symbol[s] == false && isNonTerminal(s))
+                        reach = false;
+            }
+
+            if (reach == true)
+            {
+                reachable[LHS[i]] = true;
+                for (auto s : RHS[i])
+                    reachable[s] = true;
+                newLHS.push_back(LHS[i]);
+                newRHS.push_back(RHS[i]);
+            }
+        }
+    }
+
+    // print out final grammar
+    for (int i = 0; i < newLHS.size(); ++i)
+    {
+        cout << newLHS[i] << " -> ";
+        for (auto s : newRHS[i])
+            cout << s << ' ';
+        cout << endl;
+    }
+}
+
+
+bool unionExcludeEpsilon(unordered_set<string> a, unordered_set<string> b)
+{
+    int n = a.size();
+
+    a.insert(b.begin(), b.end());
+    a.erase(a.find("#"));
+
+    return ( n != a.size() );
+}
+
+bool unionEpsilon(unordered_set<string> a)
+{
+    int n = a.size();
+    a.insert("#");
+    return ( n != a.size() );
+}
+
+bool isEpsilonIn(unordered_set<string> a)
+{
+    return ( a.find("#") != a.end() );
 }
 
 // Task 3
 void CalculateFirstSets()
 {
-    cout << "3\n";
+    //cout << "3\n";
+    //unordered_map<"string", unordered_set<string>> FIRST;
 }
 
 // Task 4
