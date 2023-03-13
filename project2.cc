@@ -46,9 +46,34 @@ void ReadGrammar()
 }
 
 // Task 1
+
 void printTerminalsAndNoneTerminals()
 {
-    cout << "1\n";
+    for (int i = 0; i < LHS.size(); ++i)
+    {
+        for (int j = 0; j < RHS[i].size(); ++j)
+        {
+            if(isTerminal(RHS[i][j]))
+             cout << RHS[i][j] << " ";
+            
+        }
+    }
+    
+    for (int i = 0; i < LHS.size(); ++i)
+    cout << LHS[i] << " ";
+
+}
+
+// Task 1 helper function
+bool isTerminal(string symbol)
+{
+    for(int i = 0; i < LHS.size(); ++i)
+    {
+        if (symbol == LHS[i])
+            return false;
+
+    }
+    return true;
 }
 
 // Task 2
