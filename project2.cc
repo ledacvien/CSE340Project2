@@ -40,13 +40,7 @@ void ReadGrammar()
 
     for (auto s : LHS)
     {
-        bool isIn = false;
-        for (auto t : non_terminal)
-            if (t == s){
-                isIn = true;
-                break;
-            }
-        if (!isIn)
+        if (!isNonTerminal(s))
             non_terminal.push_back(s);
     }
 
@@ -88,6 +82,7 @@ void printTerminalsAndNoneTerminals()
         cout << s << ' ';
     for (auto s : non_terminal)
         cout << s << ' ';
+    cout << endl;
 }
 
 
@@ -113,6 +108,7 @@ void RemoveUselessSymbols()
     for (auto s : terminal)
         symbol[s] = true;
 
+    vector<bool> simplify(LHS.size());
 
     // generating symbol
     bool changed = true;
@@ -130,6 +126,8 @@ void RemoveUselessSymbols()
                     break;
                 }
 
+            simplify[i] = generating;
+
             if (generating && symbol[LHS[i]] == false)
             {
                 symbol[LHS[i]] = true;
@@ -143,47 +141,38 @@ void RemoveUselessSymbols()
     for (it = symbol.begin(); it != symbol.end(); ++it)
         reachable[it->first] = false;
 
-    vector<string> newLHS;
-    vector< vector<string> > newRHS;
-
+    // reachable[S] = true;
+    reachable[non_terminal[0]] = true;         
     // calculating reachable
-    for (int i = 0; i < LHS.size(); ++i)
+    changed = true;
+    while(changed)
     {
-        if (reachable[LHS[i]])
+        changed = false;
+        for (int i = 0; i < LHS.size(); ++i)
         {
-            newLHS.push_back(LHS[i]);
-            newRHS.push_back(RHS[i]);
-        }
-        else if (symbol[LHS[i]])
-        {
-            bool reach = true;
-            if (!existNonTerminal(RHS[i]))
-                reach = false;
-            else{
+            if (simplify[i] && reachable[LHS[i]])
                 for (auto s : RHS[i])
-                    if (symbol[s] == false && isNonTerminal(s))
-                        reach = false;
-            }
+                    if (reachable[s] == false)
+                    {
+                        reachable[s] = true;
+                        changed = true;
+                    }
 
-            if (reach == true)
-            {
-                reachable[LHS[i]] = true;
-                for (auto s : RHS[i])
-                    reachable[s] = true;
-                newLHS.push_back(LHS[i]);
-                newRHS.push_back(RHS[i]);
-            }
         }
     }
 
     // print out final grammar
-    for (int i = 0; i < newLHS.size(); ++i)
-    {
-        cout << newLHS[i] << " -> ";
-        for (auto s : newRHS[i])
-            cout << s << ' ';
-        cout << endl;
-    }
+    for (int i = 0; i < LHS.size(); ++i)
+        if (simplify[i] && reachable[LHS[i]])
+        {
+            cout << LHS[i] << " -> ";
+            if (RHS[i].empty())
+                cout << "#";
+            else
+                for (auto s : RHS[i])
+                    cout << s << ' ';
+            cout << endl;
+        }
 }
 
 
