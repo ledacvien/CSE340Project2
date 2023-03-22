@@ -21,9 +21,54 @@ vector<string> terminal;
 vector<string> non_terminal;
 vector<string> mixed; 
 // mixed contains every symbols included both terminals and nonterminals
+
+
 //Jennifer's version for task 1
 /*
+void printTerminalsAndNoneTerminals()
+{
+    //cout << "1\n";
+    for (int i = 0; i < LHS.size(); ++i)
+    {
+        if(notExist(mixed, LHS[i]))
+        {
+            mixed.push_back(LHS[i]);
+            //cout << LHS[i] << " ";
+        }
+        for (int j = 0; j < RHS[i].size(); ++j)
+        {
+            if(notExist(mixed,RHS[i][j])
+            {
+                mixed.push_back(RHS[i][j]);
+                //cout << RHS[i][j] << " ";  
+            }
+    }
 
+    //for (int i = 0; i < mixed.size(); ++i)
+    //cout << mixed[i] << " ";      
+
+}
+
+bool notExist(string mixed, string t)
+{
+    for( int i = 0; i < mixed[i]; ++i)
+    {   
+        if(mixed[i] == t)
+            return false;
+     }
+     return true;
+}
+
+bool isTerminal(string symbol)
+{
+    for(int i = 0; i < LHS.size(); ++i)
+    {
+        if (symbol == LHS[i])
+            return false;
+
+    }
+    return true;
+}
 
 */
 
