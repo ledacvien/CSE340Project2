@@ -19,6 +19,13 @@ vector<string> LHS;
 vector< vector<string> > RHS;
 vector<string> terminal;
 vector<string> non_terminal;
+vector<string> mixed; 
+// mixed contains every symbols included both terminals and nonterminals
+//Jennifer's version for task 1
+/*
+
+
+*/
 
 
 bool isNonTerminal(string s)
