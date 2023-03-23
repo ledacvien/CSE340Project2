@@ -15,105 +15,31 @@
 
 using namespace std;
 
+bool isTerminal(string symbol);
+bool notExist(vector<string> mixed, string t);
 vector<string> LHS;
 vector< vector<string> > RHS;
 vector<string> terminal;
 vector<string> non_terminal;
 vector<string> mixed; 
-// mixed contains every symbols included both terminals and nonterminals
-
-
-//Jennifer's version for task 1
-/*
-void printTerminalsAndNoneTerminals()
-{
-    //cout << "1\n";
-    for (int i = 0; i < LHS.size(); ++i)
-    {
-        if(notExist(mixed, LHS[i]))
-        {
-            mixed.push_back(LHS[i]);
-            //cout << LHS[i] << " ";
-        }
-        for (int j = 0; j < RHS[i].size(); ++j)
-        {
-            if(notExist(mixed,RHS[i][j])
-            {
-                mixed.push_back(RHS[i][j]);
-                //cout << RHS[i][j] << " ";  
-            }
-    }
-
-    //for (int i = 0; i < mixed.size(); ++i)
-    //cout << mixed[i] << " ";      
-
-}
-
-bool notExist(string mixed, string t)
-{
-    for( int i = 0; i < mixed[i]; ++i)
-    {   
-        if(mixed[i] == t)
-            return false;
-     }
-     return true;
-}
-
-bool isTerminal(string symbol)
-{
-    for(int i = 0; i < LHS.size(); ++i)
-    {
-        if (symbol == LHS[i])
-            return false;
-
-    }
-    return true;
-}
-
-*/
-
-
-bool isNonTerminal(string s)
-{
-    for (auto t : non_terminal)
-        if (t == s)
-            return true;
-    return false;
-}
 
 // read grammar
 void ReadGrammar()
 {
+    
     Parser myParser;
+
     myParser.ParseProgram(LHS, RHS);
-
-    terminal.clear();
-    non_terminal.clear();
-
-    for (auto s : LHS)
-    {
-        if (!isNonTerminal(s))
-            non_terminal.push_back(s);
-    }
 
     for (int i = 0; i < LHS.size(); ++i)
     {
+        cout << LHS[i] << " : ";
         for (auto s : RHS[i])
-        {
-            if (!isNonTerminal(s))
-            {
-                bool isIn = false;
-                for (auto t : terminal)
-                    if (t == s){
-                        isIn = true;
-                        break;
-                    }
-
-                if (!isIn)
-                    terminal.push_back(s);
-            }
-        }
+            cout << s << ' ';
+        cout << endl;
     }
+
+}
     /*
     Token tmp = lexer.GetToken();
     while(tmp.token_type != END_OF_FILE)
@@ -124,28 +50,75 @@ void ReadGrammar()
 
     cout << "0\n";
     */
-}
+
 
 // Task 1
+
 void printTerminalsAndNoneTerminals()
 {
-    //cout << "1\n";
-    for (auto s : terminal)
-        cout << s << ' ';
-    for (auto s : non_terminal)
-        cout << s << ' ';
-    cout << endl;
+    
+    for (int i = 0; i < LHS.size(); ++i)
+    {
+        if(notExist(mixed, LHS[i]))
+        {
+            mixed.push_back(LHS[i]);
+            //cout << LHS[i] << " ";
+        }
+        for (int j = 0; j < RHS[i].size(); ++j)
+        {
+            if(notExist(mixed,RHS[i][j]))
+            {
+                mixed.push_back(RHS[i][j]);
+                //cout << RHS[i][j] << " ";  
+            }
+        }
+    }
+
+    for(int i = 0; i < mixed.size(); ++i)
+    {
+        if(isTerminal(mixed[i]))
+            terminal.push_back(mixed[i]);
+           
+        else
+            non_terminal.push_back(mixed[i]);
+      
+    }
+
+    for(int i = 0; i < terminal.size(); ++i)
+    {
+        cout <<terminal[i] << " ";
+    }
+
+    for(int i = 0; i < non_terminal.size(); ++i)
+    {
+        cout <<non_terminal[i] << " ";
+    }
+
+    cout << "\n";
+    
 }
 
+//task1 helper functions
 
-inline bool existNonTerminal(vector<string> a)
+bool isTerminal(string symbol)
 {
-    for (auto s : a)
-        if (isNonTerminal(s))
-            return true;
-    return false;
+    for(int i = 0; i < LHS.size(); ++i)
+    {
+        if (symbol == LHS[i])
+            return false;
+    }
+    return true;
 }
 
+bool notExist(vector<string> mixed, string t)
+{
+    for( int i = 0; i < mixed.size(); ++i)
+    {   
+        if(mixed[i] == t)
+            return false;
+     }
+     return true;
+}
 // Task 2
 void RemoveUselessSymbols()
 {
