@@ -60,39 +60,30 @@ void printTerminalsAndNoneTerminals()
     for (int i = 0; i < LHS.size(); ++i)
     {
         if(notExist(mixed, LHS[i]))
-        {
-            mixed.push_back(LHS[i]);
-            //cout << LHS[i] << " ";
-        }
+            mixed.push_back(LHS[i]); 
+       
         for (int j = 0; j < RHS[i].size(); ++j)
         {
             if(notExist(mixed,RHS[i][j]))
-            {
                 mixed.push_back(RHS[i][j]);
-                //cout << RHS[i][j] << " ";  
-            }
         }
     }
 
     for(int i = 0; i < mixed.size(); ++i)
     {
         if(isTerminal(mixed[i]))
-            terminal.push_back(mixed[i]);
-           
+            terminal.push_back(mixed[i]);       
         else
-            non_terminal.push_back(mixed[i]);
-      
+            non_terminal.push_back(mixed[i]); 
     }
 
     for(int i = 0; i < terminal.size(); ++i)
-    {
         cout <<terminal[i] << " ";
-    }
+    
 
     for(int i = 0; i < non_terminal.size(); ++i)
-    {
         cout <<non_terminal[i] << " ";
-    }
+    
 
     cout << "\n";
     
